@@ -1,24 +1,28 @@
 package data
 
 import (
-	"database/sql"
-
 	"github.com/Sneh1999/Xpire/model"
 	"github.com/go-pg/pg"
+	"github.com/sirupsen/logrus"
 )
 
 type DatabaseService struct {
-	DB *sql.DB
+	DB *pg.DB
+	log *logrus.Logger
 }
 
-func NewDatabaseService(databaseConfig *model.DatabaseConfig) *DatabaseService {
+
+func NewDatabaseService(databaseConfig *model.DatabaseConfig,log *logrus.Logger) *DatabaseService {
 	db := pg.Connect(&pg.Options{
-		Addr:     databaseConfig.Address,
-		User:     databaseConfig.User,
-		Password: databaseConfig.Password,
-		Database: databaseConfig.Dbname,
+		Addr:     databaseConfig.DBAddr,
+		User:     databaseConfig.DBUser,
+		Password: databaseConfig.DBPassword,
+		Database: databaseConfig.DBName,
 	})
+	log.WithField("address", databaseConfig.DBAddr).Info("Database connected on address")
+	
 	return &DatabaseService{
 		DB: db,
+		log: log,
 	}
 }

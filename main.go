@@ -1,21 +1,23 @@
 package main
 
 import (
-	"os"
-
 	"github.com/Sneh1999/Xpire/model"
+	"github.com/kelseyhightower/envconfig"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
-
-	databaseConfig := &model.DatabaseConfig{
-		Address: os.Getenv("APP_DB_ADDR"),
-		User: os.Getenv("APP_DB_USERNAME"),
-		Password: os.Getenv("APP_DB_PASSWORD"),
-		Dbname : os.Getenv("APP_DB_NAME"),
+	log := logrus.New()
+	log.Formatter = &logrus.JSONFormatter{}
+	log.Info("App Initialised")
+	var config model.Config
+	err := envconfig.Process("xpire", &config)
+	
+	if err != nil {
+		log.WithError(err).Error("Couldn't load environment variables")
 	}
 	
-	app := NewApp(databaseConfig);
+	app := Initialize(&config.DatabaseConfig,log);
 
 	app.Run(":8000")
 }
