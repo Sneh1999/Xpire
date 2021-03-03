@@ -7,6 +7,7 @@ RUN go mod download
 
 COPY . .
 
+RUN go fmt ./...
 RUN go build .
 
 EXPOSE 8000

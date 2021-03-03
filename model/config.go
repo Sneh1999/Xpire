@@ -5,12 +5,11 @@ type Config struct {
 
 	// Inherit database config details
 	DatabaseConfig
-	
 }
 
 type DatabaseConfig struct {
-	DBAddr string
-	DBUser string
+	DBAddr     string
+	DBUser     string
 	DBPassword string
-	DBName string
+	DBName     string
 }

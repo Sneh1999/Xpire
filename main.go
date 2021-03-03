@@ -12,12 +12,12 @@ func main() {
 	log.Info("App Initialised")
 	var config model.Config
 	err := envconfig.Process("xpire", &config)
-	
+
 	if err != nil {
 		log.WithError(err).Error("Couldn't load environment variables")
 	}
-	
-	app := Initialize(&config.DatabaseConfig,log);
+
+	app := Initialize(&config.DatabaseConfig, log)
 
 	app.Run(":8000")
 }
