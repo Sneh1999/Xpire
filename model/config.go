@@ -8,8 +8,8 @@ type Config struct {
 }
 
 type DatabaseConfig struct {
-	DBAddr     string
-	DBUser     string
-	DBPassword string
-	DBName     string
+	DBAddr     string `required:"true"`
+	DBUser     string `required:"true"`
+	DBPassword string `required:"true"`
+	DBName     string `required:"true"`
 }

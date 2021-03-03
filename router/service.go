@@ -12,8 +12,10 @@ type RouterService struct {
 	db     *data.DatabaseService
 }
 
-func NewRouterService(log *logrus.Logger, db *data.DatabaseService) *RouterService {
+func NewRouterService(db *data.DatabaseService, log *logrus.Logger) *RouterService {
 	router := mux.NewRouter()
+	authHandler := NewAuthHandler(db, log)
+	router.HandleFunc("/v1/signup", authHandler.SignUp).Methods("POST")
 	return &RouterService{
 		Router: router,
 		log:    log,

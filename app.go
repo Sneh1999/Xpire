@@ -27,7 +27,7 @@ func Initialize(databaseConfig *model.DatabaseConfig, log *logrus.Logger) *App {
 
 	log.WithField("address", databaseConfig.DBAddr).Info("Database connected on address")
 
-	routerService := router.NewRouterService(log, databaseService)
+	routerService := router.NewRouterService(databaseService, log)
 	return &App{
 		dbService:     databaseService,
 		routerService: routerService,
