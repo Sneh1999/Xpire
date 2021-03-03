@@ -1,4 +1,4 @@
-package model
+package models
 
 import (
 	"time"
@@ -6,6 +6,6 @@ import (
 
 // Order struct
 type Order struct {
-	ID   int64 	  `json:"id"`
+	ID   int64      `json:"id"`
 	Date *time.Time `json:"date"`
 }

@@ -1,4 +1,4 @@
-package model
+package models
 
 import "github.com/dgrijalva/jwt-go"
 
@@ -11,6 +11,6 @@ type JwtWrapper struct {
 
 // JwtClaim adds email as a claim to the token
 type JwtClaim struct {
-	Email string
+	ID string
 	jwt.StandardClaims
 }
