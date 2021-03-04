@@ -31,8 +31,7 @@ func NewAuthHandler(databaseService *data.DatabaseService, log *logrus.Logger, j
 	return authHandler
 }
 
-
-//Login  helps in user login 
+//Login  helps in user login
 func (auth *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	var loginRequest models.LoginRequest
 	var errorResponse models.ErrorResponse
@@ -57,7 +56,7 @@ func (auth *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = auth.checkPassword(loginRequest.Password,user.Password)
+	err = auth.checkPassword(loginRequest.Password, user.Password)
 
 	if err != nil {
 		auth.log.WithError(err).Error("Invalid password")
@@ -97,7 +96,7 @@ func (auth *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		errorResponse.Message = "Send in the correct credentials"
-		auth.log.WithError(err).Error(errorResponse.Message )
+		auth.log.WithError(err).Error(errorResponse.Message)
 		utils.WritePretty(w, http.StatusBadRequest, &errorResponse)
 		return
 	}
@@ -106,14 +105,14 @@ func (auth *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		auth.log.WithError(err).Error("Error in hashing the password")
-		errorResponse.Message =  "Error in hashing the password"
+		errorResponse.Message = "Error in hashing the password"
 		utils.WritePretty(w, http.StatusBadRequest, &errorResponse)
 		return
 	}
 	user.ID = uuid.NewV4().String()
 	err = auth.db.AddUser(&user)
 	if err != nil {
-		errorResponse.Message =  "Error in storing the user details"
+		errorResponse.Message = "Error in storing the user details"
 		auth.log.WithError(err).Error(errorResponse.Message)
 		utils.WritePretty(w, http.StatusBadRequest, &errorResponse)
 		return
@@ -128,14 +127,14 @@ func (auth *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		auth.log.WithError(err).Error("Error in generating the jwt token")
-		errorResponse.Message =  "Error in generating the jwt token"
+		errorResponse.Message = "Error in generating the jwt token"
 		utils.WritePretty(w, http.StatusInternalServerError, &errorResponse)
 		return
 	}
 	authResponse := &models.AuthResponse{
 		Token: token,
 	}
-	utils.WritePretty(w, http.StatusOK,authResponse)
+	utils.WritePretty(w, http.StatusOK, authResponse)
 
 }
 

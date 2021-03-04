@@ -4,7 +4,7 @@ import "github.com/Sneh1999/Xpire/models"
 
 //GetUser
 func (db *DatabaseService) GetUser(user *models.User) error {
-	err := db.db.Model(user).Where("email = ?",user.Email).Select()
+	err := db.db.Model(user).Where("email = ?", user.Email).Select()
 	return err
 }
 
