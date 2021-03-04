@@ -1,8 +1,9 @@
-package router
+package main
 
 import (
 	"github.com/Sneh1999/Xpire/data"
 	"github.com/Sneh1999/Xpire/models"
+	"github.com/Sneh1999/Xpire/router"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 )
@@ -15,12 +16,12 @@ type RouterService struct {
 }
 
 func NewRouterService(db *data.DatabaseService, log *logrus.Logger, routerConfig *models.RouterConfig) *RouterService {
-	router := mux.NewRouter()
-	authHandler := NewAuthHandler(db, log, &routerConfig.JWTConfig)
-	router.HandleFunc("/v1/signup", authHandler.SignUp).Methods("POST")
-	router.HandleFunc("/v1/login", authHandler.Login).Methods("POST")
+	muxRouter := mux.NewRouter()
+	authHandler := router.NewAuthHandler(db, log, &routerConfig.JWTConfig)
+	muxRouter.HandleFunc("/v1/signup", authHandler.SignUp).Methods("POST")
+	muxRouter.HandleFunc("/v1/login", authHandler.Login).Methods("POST")
 	return &RouterService{
-		Router:       router,
+		Router:       muxRouter,
 		log:          log,
 		db:           db,
 		routerConfig: routerConfig,
