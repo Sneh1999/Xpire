@@ -2,8 +2,9 @@ package main
 
 import (
 	"github.com/Sneh1999/Xpire/data"
+	"github.com/Sneh1999/Xpire/handlers"
+	"github.com/Sneh1999/Xpire/middlewares"
 	"github.com/Sneh1999/Xpire/models"
-	"github.com/Sneh1999/Xpire/router"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 )
@@ -15,15 +16,35 @@ type RouterService struct {
 	routerConfig *models.RouterConfig
 }
 
-func NewRouterService(db *data.DatabaseService, log *logrus.Logger, routerConfig *models.RouterConfig) *RouterService {
+func NewRouterService(db *data.DatabaseService, log *logrus.Logger, config *models.Config) *RouterService {
 	muxRouter := mux.NewRouter()
-	authHandler := router.NewAuthHandler(db, log, &routerConfig.JWTConfig)
+
+	// Set up handlers
+	authHandler := handlers.NewAuthHandler(db, log, &config.JWTConfig)
+
+	// Set up middleware
+	authMiddleware := middlewares.NewMiddlewareService(&config.JWTConfig, log)
+
+	// Set up routes
+	// Protected routes
+	protectedRoutes := muxRouter.PathPrefix("/v1/api").Subrouter()
+	protectedRoutes.Use(authMiddleware.AuthMiddleware)
+
+	// Auth routes
 	muxRouter.HandleFunc("/v1/signup", authHandler.SignUp).Methods("POST")
 	muxRouter.HandleFunc("/v1/login", authHandler.Login).Methods("POST")
+
+	// Product routes
+
+	// Other routes
+
+	// Test routes
+	protectedRoutes.HandleFunc("/hello", authHandler.Hello).Methods("GET")
+
 	return &RouterService{
 		Router:       muxRouter,
 		log:          log,
 		db:           db,
-		routerConfig: routerConfig,
+		routerConfig: &config.RouterConfig,
 	}
 }

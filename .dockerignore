@@ -1,0 +1,4 @@
+./pgdata/
+Dockerfile
+docker-compose.yml
+.env

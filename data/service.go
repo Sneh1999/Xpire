@@ -41,7 +41,6 @@ func (d *DatabaseService) createSchema() error {
 	models := []interface{}{
 		(*models.User)(nil),
 		(*models.Product)(nil),
-		(*models.Order)(nil),
 	}
 
 	for _, model := range models {

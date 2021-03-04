@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/Sneh1999/Xpire/data"
@@ -12,7 +13,6 @@ import (
 func main() {
 	log := logrus.New()
 	log.Formatter = &logrus.JSONFormatter{}
-	log.Info("App Initialised")
 	var config models.Config
 	err := envconfig.Process("xpire", &config)
 
@@ -27,8 +27,7 @@ func main() {
 
 	log.WithField("address", &config.DatabaseConfig.DBAddr).Info("Database connected on address")
 
-	routerService := NewRouterService(databaseService, log, &config.RouterConfig)
+	routerService := NewRouterService(databaseService, log, &config)
 
-	//TODO: add error handling - server crashing
-	http.ListenAndServe(config.Port, routerService.Router)
+	log.Fatal(http.ListenAndServe(":"+fmt.Sprint(config.Port), routerService.Router))
 }

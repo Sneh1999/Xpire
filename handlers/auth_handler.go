@@ -1,8 +1,7 @@
-package router
+package handlers
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"time"
 
@@ -158,37 +157,6 @@ func (auth *AuthHandler) generateToken(j *models.JwtWrapper, userID string) (str
 	return signedToken, nil
 }
 
-//ValidateToken validates the token
-
-func (auth *AuthHandler) validateToken(signedToken string, j *models.JwtWrapper) (*models.JwtClaim, error) {
-	token, err := jwt.ParseWithClaims(
-		signedToken,
-		// determines the structure for claims
-		&models.JwtClaim{},
-		// returns secret key
-		func(token *jwt.Token) (interface{}, error) {
-			return []byte(j.SecretKey), nil
-		},
-	)
-	if err != nil {
-		return nil, err
-	}
-	//converting token.claims to our claims model
-	claims, ok := token.Claims.(*models.JwtClaim)
-
-	if !ok {
-		err = errors.New("Couldn't parse claims")
-		return nil, err
-	}
-
-	if claims.ExpiresAt < time.Now().Local().Unix() {
-		err = errors.New("JWT is expired")
-		return nil, err
-	}
-	return claims, nil
-
-}
-
 // HashPassword hashes the password
 func (auth *AuthHandler) hashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
@@ -205,4 +173,8 @@ func (auth *AuthHandler) checkPassword(password string, hashedPassword string) e
 
 	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 	return err
+}
+
+func (auth *AuthHandler) Hello(w http.ResponseWriter, r *http.Request) {
+	utils.WritePretty(w, http.StatusOK, "hello")
 }
