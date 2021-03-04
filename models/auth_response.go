@@ -1,6 +1,6 @@
 package models
 
 
-type SignUpResponse struct {
+type AuthResponse struct {
 	Token string `json:"token"`
 }

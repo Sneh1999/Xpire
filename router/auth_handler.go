@@ -31,11 +31,63 @@ func NewAuthHandler(databaseService *data.DatabaseService, log *logrus.Logger, j
 	return authHandler
 }
 
-// TODO: change the way router gets handled
+
+//Login  helps in user login 
+func (auth *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
+	var loginRequest models.LoginRequest
+	var errorResponse models.ErrorResponse
+	err := json.NewDecoder(r.Body).Decode(&loginRequest)
+
+	auth.log.WithFields(logrus.Fields{
+		"email": loginRequest.Email,
+	}).Debug("Received Login request")
+
+	if err != nil {
+		auth.log.WithError(err).Error("Invalid user details sent in request")
+		errorResponse.Message = "Send in the correct credentials"
+		utils.WritePretty(w, http.StatusBadRequest, &errorResponse)
+		return
+	}
+	user := &models.User{Email: loginRequest.Email}
+	err = auth.db.GetUser(user)
+	if err != nil {
+		auth.log.WithError(err).Error("User not found")
+		errorResponse.Message = "User not found"
+		utils.WritePretty(w, http.StatusBadRequest, &errorResponse)
+		return
+	}
+
+	err = auth.checkPassword(loginRequest.Password,user.Password)
+
+	if err != nil {
+		auth.log.WithError(err).Error("Invalid password")
+		errorResponse.Message = "Invalid Password"
+		utils.WritePretty(w, http.StatusBadRequest, &errorResponse)
+		return
+	}
+	jwtWrapper := &models.JwtWrapper{
+		SecretKey:       auth.jwtConfig.SecretKey,
+		Issuer:          auth.jwtConfig.Issuer,
+		ExpirationHours: auth.jwtConfig.ExpirationHours,
+	}
+	token, err := auth.generateToken(jwtWrapper, user.ID)
+
+	if err != nil {
+		auth.log.WithError(err).Error("Error in generating the jwt token")
+		errorResponse.Message = "User couldnt be added"
+		utils.WritePretty(w, http.StatusBadRequest, &errorResponse)
+		return
+	}
+	authResponse := &models.AuthResponse{
+		Token: token,
+	}
+	utils.WritePretty(w, http.StatusOK, authResponse)
+}
 
 // SignUp helps in adding a new user
 func (auth *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	var user models.User
+	var errorResponse models.ErrorResponse
 	err := json.NewDecoder(r.Body).Decode(&user)
 
 	auth.log.WithFields(logrus.Fields{
@@ -44,8 +96,9 @@ func (auth *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	}).Debug("Received Signup request")
 
 	if err != nil {
-		auth.log.WithError(err).Error("Invalid user details sent in request")
-		utils.WritePretty(w, http.StatusBadRequest, "Send in the correct credentials")
+		errorResponse.Message = "Send in the correct credentials"
+		auth.log.WithError(err).Error(errorResponse.Message )
+		utils.WritePretty(w, http.StatusBadRequest, &errorResponse)
 		return
 	}
 
@@ -53,14 +106,16 @@ func (auth *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		auth.log.WithError(err).Error("Error in hashing the password")
-		utils.WritePretty(w, http.StatusInternalServerError, "User couldnt be added")
+		errorResponse.Message =  "Error in hashing the password"
+		utils.WritePretty(w, http.StatusBadRequest, &errorResponse)
 		return
 	}
-	user.ID = uuid.NewV4()
+	user.ID = uuid.NewV4().String()
 	err = auth.db.AddUser(&user)
 	if err != nil {
-		auth.log.WithError(err).Error("Error in storing the user details")
-		utils.WritePretty(w, http.StatusInternalServerError, "User couldnt be added")
+		errorResponse.Message =  "Error in storing the user details"
+		auth.log.WithError(err).Error(errorResponse.Message)
+		utils.WritePretty(w, http.StatusBadRequest, &errorResponse)
 		return
 	}
 
@@ -69,17 +124,18 @@ func (auth *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 		Issuer:          auth.jwtConfig.Issuer,
 		ExpirationHours: auth.jwtConfig.ExpirationHours,
 	}
-	token, err := auth.generateToken(jwtWrapper, user.ID.String())
+	token, err := auth.generateToken(jwtWrapper, user.ID)
 
 	if err != nil {
 		auth.log.WithError(err).Error("Error in generating the jwt token")
-		utils.WritePretty(w, http.StatusInternalServerError, "User couldnt be added")
+		errorResponse.Message =  "Error in generating the jwt token"
+		utils.WritePretty(w, http.StatusInternalServerError, &errorResponse)
 		return
 	}
-	signUpResponse := &models.SignUpResponse{
+	authResponse := &models.AuthResponse{
 		Token: token,
 	}
-	utils.WritePretty(w, http.StatusOK, signUpResponse)
+	utils.WritePretty(w, http.StatusOK,authResponse)
 
 }
 
@@ -146,16 +202,8 @@ func (auth *AuthHandler) hashPassword(password string) (string, error) {
 }
 
 // CheckPassword decrypts the password
-func (auth *AuthHandler) checkPassword(password string, userID string) error {
-	id,err := uuid.FromString(userID)
-	if err != nil {
-		return err
-	}
-	user := &models.User{ID: id}
-	err = auth.db.DB.Model(user).WherePK().Select()
-	if err != nil {
-		return err
-	}
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+func (auth *AuthHandler) checkPassword(password string, hashedPassword string) error {
+
+	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 	return err
 }

@@ -18,6 +18,7 @@ func NewRouterService(db *data.DatabaseService, log *logrus.Logger, routerConfig
 	router := mux.NewRouter()
 	authHandler := NewAuthHandler(db, log, &routerConfig.JWTConfig)
 	router.HandleFunc("/v1/signup", authHandler.SignUp).Methods("POST")
+	router.HandleFunc("/v1/login", authHandler.Login).Methods("POST")
 	return &RouterService{
 		Router:       router,
 		log:          log,

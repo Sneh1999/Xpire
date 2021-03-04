@@ -8,7 +8,7 @@ import (
 )
 
 type DatabaseService struct {
-	DB  *pg.DB
+	db  *pg.DB
 	log *logrus.Logger
 }
 
@@ -23,7 +23,7 @@ func NewDatabaseService(databaseConfig *models.DatabaseConfig, log *logrus.Logge
 	})
 
 	databaseService := &DatabaseService{
-		DB:  db,
+		db:  db,
 		log: log,
 	}
 
@@ -45,8 +45,8 @@ func (d *DatabaseService) createSchema() error {
 	}
 
 	for _, model := range models {
-		err := d.DB.Model(model).CreateTable(&orm.CreateTableOptions{
-			Temp: true,
+		err := d.db.Model(model).CreateTable(&orm.CreateTableOptions{
+			Temp: false,
 		})
 		if err != nil {
 			return err
