@@ -2,8 +2,10 @@ package models
 
 // User struct
 type User struct {
-	ID       string `json:"id" pg:",pk`
-	Name     string `required:"true" json:"name"`
-	Email    string `required:"true" json:"email"`
-	Password string `required:"true" json:"password"`
+	tableName struct{} `sql:"user"`
+	ID        string   `json:"id" pg:",pk"`
+	Name      string   `json:"name"`
+	Email     string   `json:"email"`
+	Password  string   `json:"password"`
+	Orders    []*Order `json:"orders" pg:"rel:has-many"`
 }

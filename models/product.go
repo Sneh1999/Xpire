@@ -6,7 +6,9 @@ import (
 
 // Product struct
 type Product struct {
-	ID     int       `json:"id"`
-	Name   string    `json:"name"`
-	Expiry time.Time `json:"expiry"`
+	tableName struct{}  `sql:"products"`
+	ID        string    `json:"id" pg:",pk"`
+	Name      string    `json:"name"`
+	Expiry    time.Time `json:"expiry"`
+	OrderID   string
 }

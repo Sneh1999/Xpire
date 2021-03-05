@@ -21,6 +21,7 @@ func NewRouterService(db *data.DatabaseService, log *logrus.Logger, config *mode
 
 	// Set up handlers
 	authHandler := handlers.NewAuthHandler(db, log, &config.JWTConfig)
+	orderHandler := handlers.NewOrderHandler(db, log, &config.JWTConfig)
 
 	// Set up middleware
 	authMiddleware := middlewares.NewMiddlewareService(&config.JWTConfig, log)
@@ -36,8 +37,8 @@ func NewRouterService(db *data.DatabaseService, log *logrus.Logger, config *mode
 
 	// Product routes
 
-	// Other routes
-
+	// Order routes
+	protectedRoutes.HandleFunc("/order", orderHandler.CreateOrder).Methods("POST")
 	// Test routes
 	protectedRoutes.HandleFunc("/hello", authHandler.Hello).Methods("GET")
 
