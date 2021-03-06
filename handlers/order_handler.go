@@ -64,8 +64,9 @@ func (h *OrderHandler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	defaultMessage := &models.DefaultResponse{
+	orderMessage := &models.OrderResponse{
 		Message: "Order created succesfuly",
+		OrderID: order.ID,
 	}
-	utils.WritePretty(w, http.StatusOK, defaultMessage)
+	utils.WritePretty(w, http.StatusOK, orderMessage)
 }

@@ -22,7 +22,7 @@ func NewRouterService(db *data.DatabaseService, log *logrus.Logger, config *mode
 	// Set up handlers
 	authHandler := handlers.NewAuthHandler(db, log, &config.JWTConfig)
 	orderHandler := handlers.NewOrderHandler(db, log, &config.JWTConfig)
-
+	productHandler := handlers.NewProductHandler(db, log, &config.JWTConfig)
 	// Set up middleware
 	authMiddleware := middlewares.NewMiddlewareService(&config.JWTConfig, log)
 
@@ -36,11 +36,16 @@ func NewRouterService(db *data.DatabaseService, log *logrus.Logger, config *mode
 	muxRouter.HandleFunc("/v1/login", authHandler.Login).Methods("POST")
 
 	// Product routes
+	protectedRoutes.HandleFunc("/product", productHandler.CreateProduct).Methods("POST")
+	// protectedRoutes.HandleFunc("/order", productHandler.CreateProduct).Methods("POST")
+	// protectedRoutes.HandleFunc("/order", productHandler.CreateProduct).Methods("POST")
+	// protectedRoutes.HandleFunc("/order", productHandler.CreateProduct).Methods("POST")
 
 	// Order routes
+	// protectedRoutes.HandleFunc("/order", orderHandler.GetOrder).Methods("GET")
 	protectedRoutes.HandleFunc("/order", orderHandler.CreateOrder).Methods("POST")
-	// Test routes
-	protectedRoutes.HandleFunc("/hello", authHandler.Hello).Methods("GET")
+	// protectedRoutes.HandleFunc("/order", orderHandler.GetOrder).Methods("PUT")
+	// protectedRoutes.HandleFunc("/order", orderHandler.GetOrder).Methods("DELETE")
 
 	return &RouterService{
 		Router:       muxRouter,
