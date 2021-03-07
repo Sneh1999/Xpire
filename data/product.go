@@ -13,3 +13,15 @@ func (db *DatabaseService) AddProduct(product *models.Product) error {
 	_, err := db.db.Model(product).Insert()
 	return err
 }
+
+//EditProduct helps us editing a product
+func (db *DatabaseService) EditProduct(product *models.Product) error {
+	_, err := db.db.Model(product).Where("id = ?", product.ID).Update()
+	return err
+}
+
+//DeleteProduct helps us editing a product
+func (db *DatabaseService) DeleteProduct(product *models.Product) error {
+	_, err := db.db.Model(product).Where("id = ?", product.ID).Update()
+	return err
+}

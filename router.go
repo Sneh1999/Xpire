@@ -36,16 +36,16 @@ func NewRouterService(db *data.DatabaseService, log *logrus.Logger, config *mode
 	muxRouter.HandleFunc("/v1/login", authHandler.Login).Methods("POST")
 
 	// Product routes
+	protectedRoutes.HandleFunc("/product", productHandler.GetProduct).Methods("GET")
 	protectedRoutes.HandleFunc("/product", productHandler.CreateProduct).Methods("POST")
-	// protectedRoutes.HandleFunc("/order", productHandler.CreateProduct).Methods("POST")
-	// protectedRoutes.HandleFunc("/order", productHandler.CreateProduct).Methods("POST")
-	// protectedRoutes.HandleFunc("/order", productHandler.CreateProduct).Methods("POST")
+	protectedRoutes.HandleFunc("/product", productHandler.EditProduct).Methods("PUT")
+	protectedRoutes.HandleFunc("/product", productHandler.DeleteProduct).Methods("DELETE")
 
 	// Order routes
 	// protectedRoutes.HandleFunc("/order", orderHandler.GetOrder).Methods("GET")
 	protectedRoutes.HandleFunc("/order", orderHandler.CreateOrder).Methods("POST")
-	// protectedRoutes.HandleFunc("/order", orderHandler.GetOrder).Methods("PUT")
-	// protectedRoutes.HandleFunc("/order", orderHandler.GetOrder).Methods("DELETE")
+	// protectedRoutes.HandleFunc("/order", orderHandler.EditOrder).Methods("PUT")
+	// protectedRoutes.HandleFunc("/order", orderHandler.DeleteOrder).Methods("DELETE")
 
 	return &RouterService{
 		Router:       muxRouter,

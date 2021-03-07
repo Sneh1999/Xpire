@@ -10,5 +10,6 @@ type Product struct {
 	ID        string    `json:"id" pg:",pk"`
 	Name      string    `json:"name"`
 	Expiry    time.Time `json:"expiry"`
-	OrderID   string
+	OrderID   string    `json:"order_id"`
+	Delete    bool      `json:"delete" default:false`
 }
