@@ -2,8 +2,8 @@ package data
 
 import (
 	"github.com/Sneh1999/Xpire/models"
-	"github.com/go-pg/pg"
-	"github.com/go-pg/pg/orm"
+	"github.com/go-pg/pg/v10"
+	"github.com/go-pg/pg/v10/orm"
 	"github.com/sirupsen/logrus"
 )
 

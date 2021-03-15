@@ -1,14 +1,18 @@
 package models
 
 type GetOrderRequest struct {
-	OrderId string `json:"order_id"`
+	ID string `json:"id"`
+}
+
+type CreateOrderRequest struct {
+	Name string `json:"name"`
 }
 
 type EditOrderRequest struct {
-	ID       string     `json:"order_id"`
-	Products []*Product `json:"products"`
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 
 type DeleteOrderRequest struct {
-	ID string `json:"order_id"`
+	ID string `json:"id"`
 }

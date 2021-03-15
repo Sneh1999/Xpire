@@ -34,6 +34,12 @@ func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 	var productRequest models.GetProductRequest
 
 	err := json.NewDecoder(r.Body).Decode(&productRequest)
+	if err != nil {
+		errorResponse.Message = "Invalid Request"
+		h.log.WithError(err).Error(errorResponse.Message)
+		utils.WritePretty(w, http.StatusBadRequest, &errorResponse)
+		return
+	}
 
 	h.log.WithFields(logrus.Fields{
 		"product": productRequest,
@@ -71,11 +77,10 @@ func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	// Get the order which wants to  add the order
 
 	err := json.NewDecoder(r.Body).Decode(&productRequest)
-
 	if err != nil {
-		errorResponse.Message = "The details sent by the user are incorrect"
+		errorResponse.Message = "Invalid Request"
 		h.log.WithError(err).Error(errorResponse.Message)
-		utils.WritePretty(w, http.StatusInternalServerError, &errorResponse)
+		utils.WritePretty(w, http.StatusBadRequest, &errorResponse)
 		return
 	}
 
@@ -127,6 +132,12 @@ func (h *ProductHandler) EditProduct(w http.ResponseWriter, r *http.Request) {
 	var productRequest models.EditProductRequest
 
 	err := json.NewDecoder(r.Body).Decode(&productRequest)
+	if err != nil {
+		errorResponse.Message = "Invalid Request"
+		h.log.WithError(err).Error(errorResponse.Message)
+		utils.WritePretty(w, http.StatusBadRequest, &errorResponse)
+		return
+	}
 
 	h.log.WithFields(logrus.Fields{
 		"product": productRequest,
@@ -156,13 +167,7 @@ func (h *ProductHandler) EditProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	productMessage := &models.EditProductResponse{
-		ID:      product.ID,
-		Name:    product.Name,
-		Expiry:  product.Expiry.String(),
-		OrderID: product.OrderID,
-	}
-	utils.WritePretty(w, http.StatusCreated, productMessage)
+	utils.WritePretty(w, http.StatusNoContent, nil)
 }
 
 //DeleteProduct helps in deleting a product
@@ -171,6 +176,12 @@ func (h *ProductHandler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 	var productRequest models.DeleteProductRequest
 
 	err := json.NewDecoder(r.Body).Decode(&productRequest)
+	if err != nil {
+		errorResponse.Message = "Invalid Request"
+		h.log.WithError(err).Error(errorResponse.Message)
+		utils.WritePretty(w, http.StatusBadRequest, &errorResponse)
+		return
+	}
 
 	h.log.WithFields(logrus.Fields{
 		"product": productRequest,
@@ -206,9 +217,5 @@ func (h *ProductHandler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 		utils.WritePretty(w, http.StatusInternalServerError, &errorResponse)
 		return
 	}
-
-	productMessage := &models.DeleteProductResponse{
-		Message: "Successfully deleted the product",
-	}
-	utils.WritePretty(w, http.StatusNoContent, productMessage)
+	utils.WritePretty(w, http.StatusNoContent, nil)
 }

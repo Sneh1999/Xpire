@@ -1,5 +1,5 @@
 docker kill $(docker ps -q)
-docker rm ${docker ps -q}
+docker rm $(docker ps -aq)
 rm -rf ./pgdata/
 
 go fmt ./...

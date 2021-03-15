@@ -11,5 +11,5 @@ type Product struct {
 	Name      string    `json:"name"`
 	Expiry    time.Time `json:"expiry"`
 	OrderID   string    `json:"order_id"`
-	Delete    bool      `json:"delete" default:false`
+	Delete    bool      `json:"delete" pg:",use_zero"`
 }

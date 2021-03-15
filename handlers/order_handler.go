@@ -34,12 +34,19 @@ func (h *OrderHandler) GetOrder(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&orderRequest)
 
+	if err != nil {
+		errorResponse.Message = "Invalid Request"
+		h.log.WithError(err).Error(errorResponse.Message)
+		utils.WritePretty(w, http.StatusBadRequest, &errorResponse)
+		return
+	}
+
 	h.log.WithFields(logrus.Fields{
 		"order": orderRequest,
 	}).Info("Received Get Order request")
 
 	order := &models.Order{
-		ID: orderRequest.OrderId,
+		ID: orderRequest.ID,
 	}
 
 	err = h.db.GetOrder(order)
@@ -63,19 +70,17 @@ func (h *OrderHandler) GetOrder(w http.ResponseWriter, r *http.Request) {
 func (h *OrderHandler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 
 	var errorResponse models.ErrorResponse
-
-	// Get the user which wants to  add the order
-	userID := r.Context().Value(models.ContextKey("user_id"))
-
-	user := &models.User{ID: userID.(string)}
-	err := h.db.GetUser(user)
+	var orderRequest models.CreateOrderRequest
+	err := json.NewDecoder(r.Body).Decode(&orderRequest)
 
 	if err != nil {
-		h.log.WithError(err).Error("Invalid user details sent in request")
-		errorResponse.Message = "Send in the correct credentials"
+		errorResponse.Message = "Invalid Request"
+		h.log.WithError(err).Error(errorResponse.Message)
 		utils.WritePretty(w, http.StatusBadRequest, &errorResponse)
 		return
 	}
+	// Get the user which wants to  add the order
+	userID := r.Context().Value(models.ContextKey("user_id"))
 
 	h.log.WithFields(logrus.Fields{
 		"user": userID,
@@ -85,10 +90,10 @@ func (h *OrderHandler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	order := &models.Order{
 		UserID: userID.(string),
 		ID:     uuid.NewV4().String(),
+		Name:   orderRequest.Name,
 	}
 
 	err = h.db.AddOrder(order)
-
 	if err != nil {
 		errorResponse.Message = "Error in creating the order"
 		h.log.WithError(err).Error(errorResponse.Message)
@@ -103,20 +108,29 @@ func (h *OrderHandler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	utils.WritePretty(w, http.StatusCreated, orderMessage)
 }
 
-//EsitOrder helps in editing an order
+//TODO: for products and orders validate the user
+
+//EditOrder helps in editing an order
 func (h *OrderHandler) EditOrder(w http.ResponseWriter, r *http.Request) {
 	var errorResponse models.ErrorResponse
 	var orderResponse models.EditOrderRequest
 
 	err := json.NewDecoder(r.Body).Decode(&orderResponse)
 
+	if err != nil {
+		errorResponse.Message = "Invalid Request"
+		h.log.WithError(err).Error(errorResponse.Message)
+		utils.WritePretty(w, http.StatusBadRequest, &errorResponse)
+		return
+	}
+
 	h.log.WithFields(logrus.Fields{
 		"order": orderResponse,
 	}).Info("Received Edit Order request")
 
 	order := &models.Order{
-		ID:       orderResponse.ID,
-		Products: orderResponse.Products,
+		ID:   orderResponse.ID,
+		Name: orderResponse.Name,
 	}
 
 	err = h.db.EditOrder(order)
@@ -128,12 +142,7 @@ func (h *OrderHandler) EditOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	orderMessage := &models.EditOrderResponse{
-		ID:       order.ID,
-		Products: order.Products,
-		UserID:   order.UserID,
-	}
-	utils.WritePretty(w, http.StatusOK, orderMessage)
+	utils.WritePretty(w, http.StatusNoContent, nil)
 }
 
 //DeleteOrder helps in deleting an order
@@ -141,7 +150,12 @@ func (h *OrderHandler) DeleteOrder(w http.ResponseWriter, r *http.Request) {
 	var errorResponse models.ErrorResponse
 	var orderRequest models.DeleteOrderRequest
 	err := json.NewDecoder(r.Body).Decode(&orderRequest)
-
+	if err != nil {
+		errorResponse.Message = "Invalid Request"
+		h.log.WithError(err).Error(errorResponse.Message)
+		utils.WritePretty(w, http.StatusBadRequest, &errorResponse)
+		return
+	}
 	h.log.WithFields(logrus.Fields{
 		"order": orderRequest,
 	}).Info("Received Delete order request")
@@ -168,9 +182,6 @@ func (h *OrderHandler) DeleteOrder(w http.ResponseWriter, r *http.Request) {
 
 	err = h.db.DeleteOrder(order)
 
-	productMessage := &models.DeleteOrderResponse{
-		Message: "Successfully deleted the order",
-	}
-	utils.WritePretty(w, http.StatusNoContent, productMessage)
+	utils.WritePretty(w, http.StatusNoContent, nil)
 
 }
