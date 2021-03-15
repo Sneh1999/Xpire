@@ -41,7 +41,7 @@ func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 
 	product := &models.Product{
 		OrderID: productRequest.OrderID,
-		ID:      productRequest.ProductID,
+		ID:      productRequest.ID,
 	}
 
 	err = h.db.GetProduct(product)
@@ -144,7 +144,7 @@ func (h *ProductHandler) EditProduct(w http.ResponseWriter, r *http.Request) {
 		OrderID: productRequest.OrderID,
 		Name:    productRequest.Name,
 		Expiry:  time,
-		ID:      productRequest.ProductID,
+		ID:      productRequest.ID,
 	}
 
 	err = h.db.EditProduct(product)
@@ -162,7 +162,7 @@ func (h *ProductHandler) EditProduct(w http.ResponseWriter, r *http.Request) {
 		Expiry:  product.Expiry.String(),
 		OrderID: product.OrderID,
 	}
-	utils.WritePretty(w, http.StatusOK, productMessage)
+	utils.WritePretty(w, http.StatusCreated, productMessage)
 }
 
 //DeleteProduct helps in deleting a product
@@ -178,7 +178,7 @@ func (h *ProductHandler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 
 	product := &models.Product{
 		OrderID: productRequest.OrderID,
-		ID:      productRequest.ProductID,
+		ID:      productRequest.ID,
 	}
 
 	err = h.db.GetProduct(product)
@@ -192,7 +192,7 @@ func (h *ProductHandler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 
 	product = &models.Product{
 		OrderID: productRequest.OrderID,
-		ID:      productRequest.ProductID,
+		ID:      productRequest.ID,
 		Name:    product.Name,
 		Expiry:  product.Expiry,
 		Delete:  true,
@@ -210,5 +210,5 @@ func (h *ProductHandler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 	productMessage := &models.DeleteProductResponse{
 		Message: "Successfully deleted the product",
 	}
-	utils.WritePretty(w, http.StatusOK, productMessage)
+	utils.WritePretty(w, http.StatusNoContent, productMessage)
 }

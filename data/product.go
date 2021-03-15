@@ -20,7 +20,7 @@ func (db *DatabaseService) EditProduct(product *models.Product) error {
 	return err
 }
 
-//DeleteProduct helps us editing a product
+//DeleteProduct helps us in marking a product as deleted
 func (db *DatabaseService) DeleteProduct(product *models.Product) error {
 	_, err := db.db.Model(product).Where("id = ?", product.ID).Update()
 	return err
